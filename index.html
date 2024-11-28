@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <head>
+        <link rel="manifest" href="Widget.json">
+        <script>
+            // Register the Service Worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('Widget service-worker.js').then(function(registration) {
+                    console.log('Service Worker registered with scope:', registration.scope);
+                }).catch(function(error) {
+                    console.log('Service Worker registration failed:', error);
+                });
+            }
+        </script>
+    </head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accessible Tools Widget</title>
+    <style>
+        /* Widget Styling */
+        #widget-container {
+            border: 2px solid #0078D7;
+            border-radius: 10px;
+            padding: 20px;
+            width: 350px;
+            font-family: Arial, sans-serif;
+            background: #f9f9f9;
+        }
+        .widget-section {
+            margin-bottom: 20px;
+        }
+        .widget-section h3 {
+            color: #0078D7;
+        }
+        button {
+            padding: 10px;
+            background-color: #0078D7;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #005BB5;
+        }
+        #image-preview {
+            width: 100%;
+            height: auto;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="widget-container">
+    <!-- Image Analysis -->
+    <div class="widget-section">
+        <h3>Image Analysis</h3>
+        <input type="file" id="image-upload" accept="image/*">
+        <img id="image-preview" alt="Image preview will appear here">
+        <p id="image-analysis-result"></p>
+    </div>
+
+    <!-- Speech-to-Text -->
+    <div class="widget-section">
+        <h3>Speech-to-Text</h3>
+        <button onclick="startSpeechToText()">Start Listening</button>
+        <p id="speech-text">Say something...</p>
+    </div>
+
+    <!-- Text-to-Speech -->
+    <div class="widget-section">
+        <h3>Text-to-Speech</h3>
+        <textarea id="text-input" rows="3" placeholder="Type something..."></textarea>
+        <button onclick="startTextToSpeech()">Speak</button>
+    </div>
+</div>
+
+<script>
+    // Image Analysis
+    document.getElementById('image-upload').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        const preview = document.getElementById('image-preview');
+        const result = document.getElementById('image-analysis-result');
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                result.textContent = "Analyzing image...";
+                // Simulate simple image recognition
+                setTimeout(() => {
+                    result.textContent = "Objects detected: Example Object 1, Example Object 2.";
+                }, 2000); // Mock analysis delay
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Speech-to-Text
+    function startSpeechToText() {
+        const speechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!speechRecognition) {
+            alert("Speech Recognition not supported in this browser.");
+            return;
+        }
+        const recognition = new speechRecognition();
+        recognition.onresult = function(event) {
+            document.getElementById('speech-text').textContent = event.results[0][0].transcript;
+        };
+        recognition.start();
+    }
+
+    // Text-to-Speech
+    function startTextToSpeech() {
+        const text = document.getElementById('text-input').value;
+        if (text.trim() === "") {
+            alert("Please type something to speak.");
+            return;
+        }
+        const synth = window.speechSynthesis;
+        const utterance = new SpeechSynthesisUtterance(text);
+        synth.speak(utterance);
+    }
+</script>
+
+</body>
+</html>
